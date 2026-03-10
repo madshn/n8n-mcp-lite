@@ -113,12 +113,23 @@ process.on("SIGTERM", async () => {
 // ---- Start ----
 
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("n8n-mcp-lite server started (stdio transport)");
-  console.error(`Connected to: ${N8N_HOST}`);
-  if (requireApproval) {
-    console.error("Approval mode: ON (mutations require explicit approve token)");
+  const mode = process.env.MCP_MODE ?? "stdio";
+
+  if (mode === "http") {
+    const { startHttpServer } = await import("./http-server.js");
+    console.error(`Connected to: ${N8N_HOST}`);
+    if (requireApproval) {
+      console.error("Approval mode: ON (mutations require explicit approve token)");
+    }
+    await startHttpServer(server);
+  } else {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("n8n-mcp-lite server started (stdio transport)");
+    console.error(`Connected to: ${N8N_HOST}`);
+    if (requireApproval) {
+      console.error("Approval mode: ON (mutations require explicit approve token)");
+    }
   }
 }
 

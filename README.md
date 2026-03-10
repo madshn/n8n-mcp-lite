@@ -189,6 +189,51 @@ The server communicates over `stdin`/`stdout` using the standard MCP protocol. N
 
 ---
 
+### HTTP Streamable Transport (Remote / Cloud)
+
+For remote or cloud MCP clients that cannot spawn a local subprocess, n8n-mcp-lite supports HTTP Streamable transport via `MCP_MODE=http`.
+
+**Start the server in HTTP mode:**
+
+```bash
+MCP_MODE=http AUTH_TOKEN=your-secret-token \
+  N8N_HOST=https://your-n8n.example.com N8N_API_KEY=your-api-key \
+  node dist/index.js
+```
+
+| Variable | Required | Description |
+|---|:---:|---|
+| `MCP_MODE` | No | `stdio` (default) or `http` |
+| `AUTH_TOKEN` | HTTP only | Bearer token for authenticating HTTP requests |
+| `MCP_PORT` | No | HTTP listen port. Default: `3000` |
+| `MCP_HOST` | No | Bind address. Default: `0.0.0.0` |
+
+**Claude Code `.mcp.json` config:**
+
+```json
+{
+  "mcpServers": {
+    "n8n-mcp-lite": {
+      "type": "http",
+      "url": "http://your-server:3000/mcp",
+      "headers": {
+        "Authorization": "Bearer your-secret-token"
+      }
+    }
+  }
+}
+```
+
+**Endpoints:**
+- `POST /mcp` — MCP JSON-RPC requests (initialize, tool calls)
+- `GET /mcp` — SSE stream for server-initiated messages (requires `mcp-session-id` header)
+- `DELETE /mcp` — Session cleanup
+- `GET /health` — Health check (no auth required)
+
+Stdio transport remains the default. Existing configurations are unaffected.
+
+---
+
 ## Architecture
 
 ### Why This Exists
