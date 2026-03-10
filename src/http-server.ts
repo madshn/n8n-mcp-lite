@@ -27,7 +27,7 @@ export async function startHttpServer(server: Server): Promise<void> {
     process.exit(1);
   }
 
-  const port = parseInt(process.env.MCP_PORT ?? "3000", 10);
+  const port = parseInt(process.env.PORT ?? process.env.MCP_PORT ?? "3000", 10);
   const host = process.env.MCP_HOST ?? "0.0.0.0";
 
   const app = express();
